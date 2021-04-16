@@ -25,9 +25,15 @@ class DailyDownloader
 
   def target_content; end
 
-  def process_request; end
+  def url_list; end
+
+  def extract_target_content(_response); end
+
+  def extract_links(_target_content); end
 
   def save_json; end
+
+  def download_links(_target_content); end
 
   def load_json; end
 
@@ -37,7 +43,9 @@ class DailyDownloader
 
   def check_folders; end
 
-  def create_folders; end
+  def create_folders
+    Process.spawn('mkdir ../PDFs && mkdir JSONs && mkdir HTMLs')
+  end
 
   def target_element; end
 
