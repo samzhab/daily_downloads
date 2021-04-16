@@ -20,7 +20,7 @@ DACCS_FILE = File.read('webmocks/DACCSindex.html')
 COURTS_URI = 'https://justice.gov.bc.ca/courts/'
 
 class DailyDownloader
-  def start
+  def process_all_urls
     all_urls = url_list
     create_top_level_folders(all_urls)
     all_urls.each do |url|
@@ -55,19 +55,8 @@ class DailyDownloader
         #   )
         #   .to_return(status: 200, body: pdf_webmock_file, headers: {})
         download_file(link, folder_name)
+        display_message(link, 'notice')
       end
-    end
-  end
-
-  def login_with_session_id(session_id)
-    additional_url = "?sessionID=#{session_id}&language=En&redirect="\
-    'showDocumentSearch|doc_search_by=TendSimp!catalogueType='\
-    'SystemCatalogue!BypassCookie=yes'
-    url = "#{BASE_URL}#{LOGIN_URL}#{additional_url}"
-    begin
-      get_request(url, {}, {})
-    rescue RestClient::ExceptionWithResponse => e
-      display_error(e, url.to_s)
     end
   end
 
@@ -98,29 +87,27 @@ class DailyDownloader
     all_links
   end
 
-  def save_json; end
-
   def download_file(link, folder_name)
-    Down.download(link, destination: "PDF/#{folder_name}/#{Date.today}")
+    Down.download(link, destination: "PDFs/#{folder_name}/#{Date.today}")
 
-    display_message(link, 'status')
-    Process.spawn("mv PDF/#{folder_name}/#{Date.today}/down\*.pdf
-              PDF/#{folder_name}/#{Date.today}/#{link.split('/').last}")
+    # display_message(link, 'status')
+    folder_details = "PDFs/#{folder_name}/#{Date.today}"
+    file_name = "#{link.split('/').last.split('.').first}.pdf".sub('(', '\(')
+    file_name = file_name.sub(')', '\)')
+    Process.spawn("mv #{folder_details}/down\*.pdf #{folder_details}/#{file_name}")
   end
-
-  def load_json; end
 
   def keep_log; end
 
   def display_message(item, flag)
     case flag
     when 'notice'
-      message = "[Notice][DCFD] Finished processing #{item}..."
+      puts "[Notice][DCFD] Finished processing #{item}..."
+      true
     when 'status'
-      message = "[Status][DCFD] Processing #{item} now..."
+      puts "[Status][DCFD] Processing #{item} now..."
+      true
     end
-    puts message
-    message
   end
 
   def create_top_level_folders(all_urls)
@@ -136,10 +123,8 @@ class DailyDownloader
     Process.spawn("mkdir PDFs/#{folder_name}/#{Date.today}")
   end
 
-  def target_element; end
-
   def display_error(error, url)
-    puts "[Error][BC_BIDS] - #{error} for #{url}"
+    puts "[Error][DCFD] - #{error} for #{url}"
   end
 
   def get_request(url, headers)
@@ -160,5 +145,5 @@ class DailyDownloader
   end
 end
 
-my_downloader = DailyDownloader.new
-my_downloader.start
+# my_downloader = DailyDownloader.new
+# my_downloader.process_all_urls

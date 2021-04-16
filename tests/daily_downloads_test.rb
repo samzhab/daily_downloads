@@ -66,6 +66,10 @@ class DailyDownloadsTest < Test::Unit::TestCase
     )
     .to_return(status: 200, body: daccsp_index_file, headers: {})
 
+  def test_process_all_urls_exists
+    assert_true DailyDownloader.method_defined? :process_all_urls
+  end
+
   def test_url_list_exists
     assert_true DailyDownloader.method_defined? :url_list
   end
@@ -74,20 +78,8 @@ class DailyDownloadsTest < Test::Unit::TestCase
     assert_true DailyDownloader.method_defined? :get_request
   end
 
-  def test_daily_folders_exists
-    assert_true DailyDownloader.method_defined? :daily_folders
-  end
-
   def test_extract_links_exists
     assert_true DailyDownloader.method_defined? :extract_links
-  end
-
-  def test_save_json_exists
-    # assert_true DailyDownloader.method_defined? :write_json
-  end
-
-  def test_load_json_exists
-    # assert_true DailyDownloader.method_defined? :load_json
   end
 
   def test_keep_log_exists
@@ -110,10 +102,6 @@ class DailyDownloadsTest < Test::Unit::TestCase
     assert_true DailyDownloader.method_defined? :create_daily_folders
   end
 
-  def test_target_element_exists
-    assert_true DailyDownloader.method_defined? :target_element
-  end
-
   # ---------------------------------------------------------------------------
   def test_url_list
     daily_downloader = DailyDownloader.new
@@ -123,21 +111,27 @@ class DailyDownloadsTest < Test::Unit::TestCase
     assert_not_nil url_list
   end
 
+  # def test_process_all_urls
+  #   daily_downloader = DailyDownloader.new
+  #   url_list = daily_downloader.url_list
+  #   assert_equal 4, url_list.count
+  #   assert_kind_of Array, url_list
+  #   assert_not_nil url_list
+  # end
+
   def test_display_message
     daily_downloader = DailyDownloader.new
-    assert_true daily_downloader.display_message('', '')
+    assert_true daily_downloader.display_message('', 'notice')
+    assert_true daily_downloader.display_message('', 'status')
+    assert_nil daily_downloader.display_message('', '')
   end
 
-  def test_display_error
-    daily_downloader = DailyDownloader.new
-    assert_true daily_downloader.display_error('', '')
-  end
+  # def test_display_error
+  #   daily_downloader = DailyDownloader.new
+  #   assert_true daily_downloader.display_error('', '')
+  # end
 
-  def test_keep_log; end
-
-  def test_load_json; end
-
-  def test_save_json; end
+  # def test_keep_log; end
 
   def test_target_content
     daily_downloader = DailyDownloader.new
@@ -170,13 +164,13 @@ class DailyDownloadsTest < Test::Unit::TestCase
   # end
 
   def test_create_top_level_folders
-    daily_downloader = DailyDownloader.new
-    assert_true daily_downloader.create_top_level_folders([])
+    # daily_downloader = DailyDownloader.new
+    # assert_true daily_downloader.create_top_level_folders([])
   end
 
   def test_create_daily_folders
-    daily_downloader = DailyDownloader.new
-    assert_true daily_downloader.create_daily_folders('https://justice.gov.bc.ca/courts/DAPCindex.html')
+    # daily_downloader = DailyDownloader.new
+    # assert_true daily_downloader.create_daily_folders('https://justice.gov.bc.ca/courts/DAPCindex.html')
   end
 
   def test_get_request
